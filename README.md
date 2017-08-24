@@ -86,7 +86,7 @@
 
 # **2 非浸入式接入，使用拦截器（针对RMI协议类有效）**
 
-   1） 配置interceptor
+   **1） 配置interceptor**
 
 		<bean id="fusingSwitchRMIInterceptor" class="com.qding.fusing.ext.rmi.FusingSwitchRMIInterceptor" ></bean>
 	<aop:config> 
@@ -95,7 +95,7 @@
 	             <aop:advisor pointcut-ref="fusingSwitchRMInterceptor" advice-ref="fusingSwitchRMIInterceptor"/>
 	</aop:config> 
 
-   2）配置服务的Mock
+   **2）配置服务的Mock**
 
       1）新建mock.properties文件
 
