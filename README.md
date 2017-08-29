@@ -88,12 +88,12 @@
 
    **1） 配置interceptor**
 
-		<bean id="fusingSwitchRMIInterceptor" class="com.qding.fusing.ext.rmi.FusingSwitchRMIInterceptor" ></bean>
-	<aop:config> 
-	             <!--expression 是依赖的Order服务接口类--> 
-	             <aop:pointcut id="fusingSwitchRMInterceptor" expression="execution(public * com.package.Order.*(..)) "/>  
-	             <aop:advisor pointcut-ref="fusingSwitchRMInterceptor" advice-ref="fusingSwitchRMIInterceptor"/>
-	</aop:config> 
+	<aop:config>
+		<!-- pointcut 配置成需要拦截的路径 -->
+		<aop:advisor order="1" pointcut="execution(* com.qding.brick.remote.contract.SupplierRemote.*(..)) || execution(* com.qding.promotion.common.service.IPromotionRemoteService.*(..)) || execution(* com.qding.order.service.IRemoteOrderService.*(..))" advice-ref="fusingSwitchRMIInterceptor"/>
+	</aop:config>
+	
+	<bean id="fusingSwitchRMIInterceptor" class="com.qding.fusing.ext.rmi.FusingSwitchRMIInterceptor" />
 
    **2）配置服务的Mock**
 
