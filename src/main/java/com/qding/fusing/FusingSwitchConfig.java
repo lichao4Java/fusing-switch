@@ -29,7 +29,7 @@ public class FusingSwitchConfig {
 	
 	private static Logger logger = Logger.getLogger(FusingSwitchConfig.class);
 	
-	public void init(String config_path) throws Exception {
+	public FusingSwitchConfig(String config_path) throws Exception {
 		
 		logger.info("load properties " + config_path);
 

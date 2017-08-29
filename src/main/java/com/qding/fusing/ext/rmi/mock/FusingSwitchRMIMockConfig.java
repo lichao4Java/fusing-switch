@@ -15,7 +15,7 @@ public class FusingSwitchRMIMockConfig {
 	
 	private static Map<Class<?>, Class<?>> value = new HashMap<Class<?>, Class<?>>();
 	
-	public void init(String config_path) throws Exception {
+	public FusingSwitchRMIMockConfig(String config_path) throws Exception {
 		
 		logger.info("load properties " + config_path);
 
@@ -34,8 +34,8 @@ public class FusingSwitchRMIMockConfig {
                 	Class<?> providerClass = Class.forName(provider);
                 	Class<?> providerMockClass = Class.forName(providerMock);
 
-                	if(!providerMockClass.isAssignableFrom(providerClass)) {
-                		logger.error("providerMockClass is not assignableFrom " + providerClass);
+                	if(!providerClass.isAssignableFrom(providerMockClass)) {
+                		logger.error(provider +  " is not assignableFrom " + providerClass);
                 	}
                 	value.put(providerClass, providerMockClass);
 

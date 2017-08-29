@@ -12,6 +12,7 @@ import com.qding.fusing.abstracts.AbstractFusingSwitchTarget;
 import com.qding.fusing.ext.rmi.mock.FusingSwitchRMIMock;
 import com.qding.fusing.ext.rmi.mock.FusingSwitchRMIMockConfig;
 
+
 /**
  * 为RMI类的服务接口提供的熔断拦截器
  * @author lichao
@@ -23,7 +24,11 @@ public class FusingSwitchRMIInterceptor implements MethodInterceptor {
 		
 		FusingSwitchRMIProvider provider = new FusingSwitchRMIProvider();
 		
-		provider.setClazz(invocation.getThis().getClass());
+		Object providerTarget = invocation.getThis();
+		
+		Class<?> providerClazz  = getTargetClass(providerTarget);
+		
+		provider.setClazz(providerClazz);
 		
 		AbstractFusingSwitchMock mock = new FusingSwitchRMIMock() {
 			
@@ -49,5 +54,21 @@ public class FusingSwitchRMIInterceptor implements MethodInterceptor {
 		
 	}
 
+	private Class<?> getTargetClass(Object object) throws Exception {
+		Class<?> providerClazz;
+		if(ProxyUtil.isCglibProxy(object)) {
+			providerClazz = ProxyUtil.getCglibProxyTargetClass(object);
+		}
+		else if(ProxyUtil.isJdkDynamicProxy(object)) {
+			providerClazz = ProxyUtil.getJdkDynamicProxyTargetClass(object);
+		} 
+		else if(ProxyUtil.isDubboJavassistProxy(object)) {
+			providerClazz = ProxyUtil.getDubboJavassistProxyTargetClass(object);
+		}
+		else {
+			providerClazz = object.getClass();
+		}
+		return providerClazz;
+	}
     
 }

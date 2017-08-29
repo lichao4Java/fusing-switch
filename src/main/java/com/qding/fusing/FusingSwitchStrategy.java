@@ -1,5 +1,6 @@
 package com.qding.fusing;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
@@ -41,6 +42,8 @@ public class FusingSwitchStrategy {
 			fusingstatus.halfOpenFusingSwitchStatus(provider);
 		}
 		
+		logger.info("provider " + provider.toString() + " , fusingstatus " + fusingValue.getFusingSwitchStatus());
+
 		switch (fusingValue.getFusingSwitchStatus()) {
 		
 		//close
@@ -74,7 +77,15 @@ public class FusingSwitchStrategy {
 		//open
 		case 1:
 			
-			return mock.executeMock(provider);
+			try {
+				return mock.executeMock(provider);
+			} 
+			catch(InvocationTargetException e1) {
+				throw e1.getTargetException();
+			}
+			catch (Exception e) {
+				throw e;
+			}
 			
 		//half-open
 		case 2:
@@ -128,7 +139,15 @@ public class FusingSwitchStrategy {
 				
 				//return mock
 				
-				return mock.executeMock(provider);
+				try {
+					return mock.executeMock(provider);
+				} 
+				catch(InvocationTargetException e1) {
+					throw e1.getTargetException();
+				}
+				catch (Exception e) {
+					throw e;
+				}
 				
 			} catch (Exception e) {
 				throw e;
