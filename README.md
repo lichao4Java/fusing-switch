@@ -90,7 +90,7 @@
 
 	<aop:config>
 		<!-- pointcut 配置成需要拦截的路径 -->
-		<aop:advisor order="1" pointcut="execution(* com.qding.brick.remote.contract.SupplierRemote.*(..)) || execution(* com.qding.promotion.common.service.IPromotionRemoteService.*(..)) || execution(* com.qding.order.service.IRemoteOrderService.*(..))" advice-ref="fusingSwitchRMIInterceptor"/>
+		<aop:advisor order="1" pointcut="execution(* com.qding.brick.remote.contract.SupplierRemote.*(..)) || execution(* com.xx.*(..))" advice-ref="fusingSwitchRMIInterceptor"/>
 	</aop:config>
 	
 	<bean id="fusingSwitchRMIInterceptor" class="com.qding.fusing.ext.rmi.FusingSwitchRMIInterceptor" />
