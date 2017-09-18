@@ -126,7 +126,9 @@
 	half_open_fusing_switch_success_second=300
 	#half-open状态下成功次数达到了关闭熔断开关的条件
 	half_open_fusing_switch_success_count=5
-
+	#出现Exception时，是否使用mock策略
+	always_use_mock=true
+	
     2）spring中新增配置
 
 	<bean id="fusingSwitchConfig" class="com.qding.fusing.FusingSwitchConfig">
