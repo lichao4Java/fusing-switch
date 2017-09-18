@@ -27,6 +27,8 @@ public class FusingSwitchConfig {
 	//half-open状态下成功次数达到了关闭熔断开关的条件
 	public static int halfOpenFusingSwitchSuccessCount = 5;
 	
+	public static boolean alwaysUseMock;
+
 	private static Logger logger = Logger.getLogger(FusingSwitchConfig.class);
 	
 	public FusingSwitchConfig(String config_path) throws Exception {
@@ -43,6 +45,7 @@ public class FusingSwitchConfig {
             openFusingSwitchSecond =  Integer.parseInt(ps.getProperty("open_fusing_switch_second", "60"));
             halfOpenFusingSwitchSuccessSecond = Integer.parseInt(ps.getProperty("half_open_fusing_switch_success_second", "300"));
             halfOpenFusingSwitchSuccessCount = Integer.parseInt(ps.getProperty("half_open_fusing_switch_success_count", "5"));
+            alwaysUseMock = Boolean.parseBoolean(ps.getProperty("always_use_mock", "false"));
         }
         else {
         	logger.error(config_path + " not exists");

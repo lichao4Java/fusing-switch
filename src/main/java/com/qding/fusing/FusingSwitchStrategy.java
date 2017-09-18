@@ -52,15 +52,16 @@ public class FusingSwitchStrategy {
 				return target.execute();
 			} catch (Exception e) {
 				//expire at
-				long faildCountExpireAt = fusingValue.getOpenFusingSwitchFaildSecondExpireAt();
+				long openFusingSwitchFaildSecondExpireAt = fusingValue.getOpenFusingSwitchFaildSecondExpireAt();
+				long currentAt = System.currentTimeMillis();
 				
 				//时间范围外的失败数量，进行重置
-				if(faildCountExpireAt < System.currentTimeMillis()) {
+				if(openFusingSwitchFaildSecondExpireAt < currentAt) {
 					logger.info("provider " + provider.toString() + " , value " + fusingValue.toString() + " openFusingSwitchFaildSecond has expired");
 					//reset
 					fusingValue.getOpenFusingSwitchFaildCount().set(0);
 					fusingValue.setOpenFusingSwitchFaildSecondExpireAt(
-							System.currentTimeMillis() + FusingSwitchConfig.openFusingSwitchFaildSecond * 1000l
+							currentAt + FusingSwitchConfig.openFusingSwitchFaildSecond * 1000l
 						);
 				}
 				
@@ -70,46 +71,45 @@ public class FusingSwitchStrategy {
 					
 				}
 				
-				throw e;
+				if(FusingSwitchConfig.alwaysUseMock) {
+					logger.info("always_use_mock is open");
+					logger.error(e.getMessage(), e);
+					return executeMock(provider, mock);
+				}
+				else {
+					throw e;
+				}
 			}
 
 		
 		//open
 		case 1:
 			
-			try {
-				return mock.executeMock(provider);
-			} 
-			catch(InvocationTargetException e1) {
-				throw e1.getTargetException();
-			}
-			catch (Exception e) {
-				throw e;
-			}
+			return executeMock(provider, mock);
 			
 		//half-open
 		case 2:
+				
+			//70% rate
+			int[] rate = new int[]{1,3,5,2,4,6,8,10,12,14};
 			
-			try {
+			int r = new Random().nextInt(10);
+			
+			if(rate[r] % 2 == 0) {
 				
-				//50% rate
-				int[] rate = new int[]{1,3,5,7,9,2,4,6,8,10};
-				
-				int r = new Random().nextInt(10);
-				
-				if(rate[r] % 2 == 0) {
-					
+				try {
 					Object object = target.execute();
-					 
-					//expire at
-					long successCountExpireAt = fusingValue.getHalfOpenFusingSwitchSuccessSecondExpireAt();
 					
-					if(successCountExpireAt < System.currentTimeMillis()) {
+					//expire at
+					long halfOpenFusingSwitchSuccessSecondExpireAt = fusingValue.getHalfOpenFusingSwitchSuccessSecondExpireAt();
+					long currentAt = System.currentTimeMillis();
+					
+					if(halfOpenFusingSwitchSuccessSecondExpireAt < currentAt) {
 
 						logger.info("provider " + provider.toString() + " , value " + fusingValue.toString() + " halfOpenFusingSwitchSuccessSecond has expired");
 
 						//0 is default
-						if(successCountExpireAt != 0) {
+						if(halfOpenFusingSwitchSuccessSecondExpireAt != 0) {
 							
 							//时间范围外 成功次数小于阀值
 							if(fusingValue.getHalfOpenFusingSwitchSuccessCount().get() < FusingSwitchConfig.halfOpenFusingSwitchSuccessCount) {
@@ -123,7 +123,7 @@ public class FusingSwitchStrategy {
 						//时间范围外的成功数量，进行重置
 						fusingValue.getHalfOpenFusingSwitchSuccessCount().set(0);
 						fusingValue.setHalfOpenFusingSwitchSuccessSecondExpireAt(
-								System.currentTimeMillis() + FusingSwitchConfig.halfOpenFusingSwitchSuccessSecond * 1000l
+								currentAt + FusingSwitchConfig.halfOpenFusingSwitchSuccessSecond * 1000l
 							);
 						
 					}
@@ -135,28 +135,43 @@ public class FusingSwitchStrategy {
 					}
 					
 					return object;
+					
+				} catch (Exception e) {
+					
+					if(FusingSwitchConfig.alwaysUseMock) {
+						logger.info("always_use_mock is open");
+						logger.error(e.getMessage(), e);
+						return executeMock(provider, mock);
+					}
+					else {
+						throw e;
+					}
 				}
-				
-				//return mock
-				
-				try {
-					return mock.executeMock(provider);
-				} 
-				catch(InvocationTargetException e1) {
-					throw e1.getTargetException();
-				}
-				catch (Exception e) {
-					throw e;
-				}
-				
-			} catch (Exception e) {
-				throw e;
 			}
+				
+			//return mock
+			return executeMock(provider, mock);
+				
+			
 		default:
 			break;
 		}
 
 		return null;
+	}
+
+	private Object executeMock(AbstractFusingSwitchProvider provider,
+			AbstractFusingSwitchMock mock) throws Throwable {
+		
+		try {
+			return mock.executeMock(provider);
+		} 
+		catch(InvocationTargetException e1) {
+			throw e1.getTargetException();
+		}
+		catch (Exception e) {
+			throw e;
+		}
 	}
 	
 }
